@@ -1,12 +1,13 @@
 {
-  "name": "transportpro",
+  "name": "flotten-hero",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
     "start": "next start",
-    "lint": "next lint",`r`n    "postinstall": "prisma generate",
+    "lint": "next lint",
+    "postinstall": "prisma generate",
     "seed": "tsx prisma/seed.ts",
     "seed:arm64": "node prisma/seed-arm64.js",
     "seed:sql": "node prisma/seed-arm64.js",
