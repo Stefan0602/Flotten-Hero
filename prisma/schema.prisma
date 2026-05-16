@@ -1,0 +1,246 @@
+// Prisma Schema für TransportPro - Multi-Tenant Flottenmanagement
+// Unterstützt mehrere Mandanten (Unternehmen) + rollenbasierte Benutzer
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+// ====================== MULTI-TENANT ======================
+
+model Mandant {
+  id          String   @id @default(cuid())
+  name        String
+  strasse     String?
+  plz         String?
+  ort         String?
+  telefon     String?
+  email           String?
+  logoUrl         String?    // White-Label Logo
+  primaryColor    String?    // z.B. "#2563eb" - Hauptfarbe
+  secondaryColor  String?    // z.B. "#1e40af" - Sekundärfarbe
+  createdAt       DateTime @default(now())
+
+  // Beziehungen
+  users       User[]
+  kunden      Kunde[]
+  fahrer      Fahrer[]
+  fahrzeuge   Fahrzeug[]
+  auftraege   Auftrag[]
+  wartungen   Wartung[]
+  abweichungen Abweichung[]
+  auditLogs   AuditLog[]
+}
+
+// ====================== AUDIT LOG (für Admin-Aktionen) ======================
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  mandantId   String
+  mandant     Mandant  @relation(fields: [mandantId], references: [id])
+
+  userId      String   // Wer hat die Aktion ausgeführt
+  userName    String   // Name zum Zeitpunkt der Aktion
+
+  action      String   // z.B. "USER_CREATED", "USER_ROLE_CHANGED", "USER_DELETED", "PASSWORD_RESET"
+  targetType  String?  // "User", "Mandant" etc.
+  targetId    String?
+  targetName  String?  // z.B. E-Mail oder Name des betroffenen Benutzers
+
+  details     String?  // JSON oder Freitext mit Details
+
+  createdAt   DateTime @default(now())
+}
+
+// ====================== AUTH + ROLLEN ======================
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  name          String
+  passwordHash  String   // bcrypt
+
+  role          Role
+  mandantId     String
+  mandant       Mandant  @relation(fields: [mandantId], references: [id])
+
+  createdAt     DateTime @default(now())
+  lastLogin     DateTime?
+}
+
+enum Role {
+  ADMIN                      // Mandanten-Administrator: Nutzer anlegen/löschen, Rollen zuweisen, volle Kontrolle
+  LEITUNG                    // Geschäftsleitung: Voller operativer Zugriff
+  SACHBEARBEITER_DISPO       // Disposition, Beauftragung, Ausführung, Abweichungen
+  SACHBEARBEITER_STAMMDATEN  // Kunden, Fahrer, Fahrzeuge, Wartungen
+  SACHBEARBEITER_FIBU        // Abrechnung, Rechnungen, Lohnexport, Berichte
+  FAHRER                     // Eigene Aufträge + Lohnübersicht
+}
+
+// ====================== DOMÄNENMODELLE (mit Mandant) ======================
+
+model Kunde {
+  id                  String    @id @default(cuid())
+  mandantId           String
+  mandant             Mandant   @relation(fields: [mandantId], references: [id])
+
+  name                String
+  strasse             String
+  plz                 String
+  ort                 String
+  telefon             String?
+  email               String?
+  vertragsart         String?   // "Stammkunde" | "Pflegeheim" | "Klinik" | "Privat" | "Firma"
+  rechnungsintervall  String    @default("monatlich")
+  notizen             String?
+  angelegtAm          DateTime  @default(now())
+  auftraege           Auftrag[]
+}
+
+model Fahrer {
+  id                  String         @id @default(cuid())
+  mandantId           String
+  mandant             Mandant        @relation(fields: [mandantId], references: [id])
+
+  vorname             String
+  nachname            String
+  fuehrerscheinKlasse String
+  qualifikationen     String         // JSON-Array als String
+  stundenlohn         Float
+  verfuegbarVon       DateTime?
+  verfuegbarBis       DateTime?
+  status              FahrerStatus   @default(AKTIV)
+  auftraege           Auftrag[]
+  createdAt           DateTime       @default(now())
+}
+
+model Fahrzeug {
+  id                  String         @id @default(cuid())
+  mandantId           String
+  mandant             Mandant        @relation(fields: [mandantId], references: [id])
+
+  kennzeichen         String         @unique
+  modell              String
+  baujahr             Int
+  kmStand             Int            @default(0)
+  anschaffungskosten  Float
+  verbrauchPro100Km   Float?         // Für Kosten-pro-KM Berechnung (Strategisches Controlling)
+  status              FahrzeugStatus @default(VERFUEGBAR)
+  wartungen           Wartung[]
+  auftraege           Auftrag[]
+  positionen          FahrzeugPosition[]   // Echtzeit-Tracking
+}
+
+model Wartung {
+  id                       String      @id @default(cuid())
+  mandantId                String
+  mandant                  Mandant     @relation(fields: [mandantId], references: [id])
+
+  fahrzeugId               String
+  typ                      WartungTyp
+  datum                    DateTime
+  kmStand                  Int
+  kosten                   Float
+  beschreibung             String?
+  naechsteFaelligkeitKm    Int?
+  naechsteFaelligkeitDatum DateTime?
+  fahrzeug                 Fahrzeug    @relation(fields: [fahrzeugId], references: [id], onDelete: Cascade)
+}
+
+model Auftrag {
+  id                   String         @id @default(cuid())
+  mandantId            String
+  mandant              Mandant        @relation(fields: [mandantId], references: [id])
+
+  kundeId              String
+  fahrerId             String?
+  fahrzeugId           String?
+  pickupAdresse        String
+  dropoffAdresse       String
+  geplanteAbfahrt      DateTime
+  geplanteAnkunft      DateTime
+  tatsaechlicheAbfahrt DateTime?
+  tatsaechlicheAnkunft DateTime?
+  km                   Int?           // Ist-Kilometer
+  planKm               Int?           // Geplante Kilometer (für Soll-Ist-Vergleich)
+  planDauerMinuten     Int?           // Geplante Dauer der Tour
+  status               AuftragStatus  @default(GEPLANT)
+  preis                Float?
+  notizen              String?
+  kunde                Kunde          @relation(fields: [kundeId], references: [id])
+  fahrer               Fahrer?        @relation(fields: [fahrerId], references: [id])
+  fahrzeug             Fahrzeug?      @relation(fields: [fahrzeugId], references: [id])
+  abweichungen         Abweichung[]
+  createdAt            DateTime       @default(now())
+}
+
+model Abweichung {
+  id                String   @id @default(cuid())
+  mandantId         String
+  mandant           Mandant  @relation(fields: [mandantId], references: [id])
+
+  auftragId         String
+  typ               String
+  beschreibung      String
+  zeitpunkt         DateTime @default(now())
+  auswirkungMinuten Int?
+  auftrag           Auftrag  @relation(fields: [auftragId], references: [id], onDelete: Cascade)
+}
+
+// Echtzeit-Fahrzeug-Tracking von externem Anbieter
+model FahrzeugPosition {
+  id          String   @id @default(cuid())
+  mandantId   String
+  mandant     Mandant  @relation(fields: [mandantId], references: [id])
+
+  fahrzeugId  String
+  fahrzeug    Fahrzeug @relation(fields: [fahrzeugId], references: [id])
+
+  latitude    Float
+  longitude   Float
+  speed       Float?    // km/h
+  heading     Float?    // Grad 0-360
+  accuracy    Float?    // Meter
+  timestamp   DateTime  // Zeitpunkt der GPS-Messung beim Fahrzeug
+  source      String    // z.B. "webfleet", "traccar", "custom-hardware"
+
+  createdAt   DateTime  @default(now())
+
+  @@index([fahrzeugId, timestamp])
+  @@index([mandantId, timestamp])
+}
+
+enum FahrerStatus {
+  AKTIV
+  URLAUB
+  KRANK
+  INAKTIV
+}
+
+enum FahrzeugStatus {
+  VERFUEGBAR
+  IN_WARTUNG
+  NICHT_VERFUEGBAR
+}
+
+enum WartungTyp {
+  REINIGUNG
+  INSPEKTION
+  REIFEN
+  BREMSEN
+  KLIMA
+  SONSTIGES
+}
+
+enum AuftragStatus {
+  GEPLANT
+  DISPONIERT
+  IN_AUSFUEHRUNG
+  ABGESCHLOSSEN
+  ABGERECHNET
+  STORNIERT
+}

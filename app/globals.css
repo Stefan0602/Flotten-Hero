@@ -1,0 +1,214 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 84% 4.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 84% 4.9%;
+  --primary: 221.2 83.2% 53.3%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 210 40% 96.1%;
+  --secondary-foreground: 222.2 47.4% 11.2%;
+  --muted: 210 40% 96.1%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  --accent: 210 40% 96.1%;
+  --accent-foreground: 222.2 47.4% 11.2%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 221.2 83.2% 53.3%;
+  --radius: 0.75rem;
+
+  /* White-Label Branding (wird dynamisch überschrieben) */
+  --brand-primary: 221.2 83.2% 53.3%;
+  --brand-secondary: 221.2 70% 40%;
+}
+
+.dark {
+  --background: 222.2 84% 4.9%;
+  --foreground: 210 40% 98%;
+  --card: 222.2 84% 4.9%;
+  --card-foreground: 210 40% 98%;
+  --popover: 222.2 84% 4.9%;
+  --popover-foreground: 210 40% 98%;
+  --primary: 217.2 91.2% 59.8%;
+  --primary-foreground: 222.2 47.4% 11.2%;
+  --secondary: 217.2 32.6% 17.5%;
+  --secondary-foreground: 210 40% 98%;
+  --muted: 217.2 32.6% 17.5%;
+  --muted-foreground: 215 20.2% 65.1%;
+  --accent: 217.2 32.6% 17.5%;
+  --accent-foreground: 210 40% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 217.2 32.6% 17.5%;
+  --input: 217.2 32.6% 17.5%;
+  --ring: 224.3 76.3% 48%;
+}
+
+body {
+  font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+}
+
+/* Professional Business Table Styling */
+.table-row {
+  transition: background-color 0.1s ease;
+}
+.table-row:hover {
+  background-color: hsl(var(--muted));
+}
+
+/* Status Badges */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.status-geplant { background-color: #f3e8ff; color: #6b21a8; }
+.status-disponiert { background-color: #dbeafe; color: #1e40af; }
+.status-in_ausfuehrung { background-color: #fef3c7; color: #92400e; }
+.status-abgeschlossen { background-color: #d1fae5; color: #065f46; }
+.status-abgerechnet { background-color: #e0e7ff; color: #3730a3; }
+.status-storniert { background-color: #fee2e2; color: #991b1b; }
+
+.status-verfuegbar { background-color: #d1fae5; color: #065f46; }
+.status-in_wartung { background-color: #fef3c7; color: #92400e; }
+.status-nicht_verfuegbar { background-color: #fee2e2; color: #991b1b; }
+
+.status-aktiv { background-color: #d1fae5; color: #065f46; }
+.status-urlaub { background-color: #e0e7ff; color: #3730a3; }
+.status-krank { background-color: #fee2e2; color: #991b1b; }
+
+/* Card hover effect */
+.card-hover {
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), 
+              box-shadow 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+}
+
+/* Form styling */
+.input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius);
+  background: white;
+  font-size: 0.95rem;
+  transition: all 0.2s;
+}
+.input:focus {
+  outline: none;
+  border-color: hsl(var(--primary));
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: var(--radius);
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: all 0.2s;
+  cursor: pointer;
+  border: none;
+}
+
+.btn-primary {
+  background: hsl(var(--brand-primary));
+  color: white;
+}
+.btn-primary:hover {
+  filter: brightness(0.92);
+}
+
+.btn-secondary {
+  background: hsl(var(--secondary));
+  color: hsl(var(--secondary-foreground));
+}
+.btn-secondary:hover {
+  background: #e2e8f0;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: hsl(var(--muted-foreground));
+}
+.btn-ghost:hover {
+  background: hsl(var(--muted));
+}
+
+/* Modal */
+.modal {
+  animation: modalEnter 0.2s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@keyframes modalEnter {
+  from { opacity: 0; transform: scale(0.96) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* KPI Cards */
+.kpi-card {
+  background: white;
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius);
+  padding: 20px;
+  transition: all 0.2s;
+}
+.kpi-card:hover {
+  border-color: #bfdbfe;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05);
+}
+
+.kpi-value {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1;
+  color: #0f172a;
+}
+
+.kpi-label {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin-top: 4px;
+}
+
+/* Leaflet Map for Auftragsverfolgung (Live Tracking) */
+@import url('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css');
+
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+  border-radius: 16px;
+  background: #f1f5f9;
+}
+
+.vehicle-marker {
+  background: #2563eb;
+  border: 3px solid white;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
+  width: 18px;
+  height: 18px;
+}
+
+.tour-popup {
+  min-width: 240px;
+  font-size: 13px;
+}
