@@ -143,9 +143,9 @@ export default function Sidebar() {
 
   // Filtering with group support
   const filteredNav: NavItem[] = allNavItems
-    .map(item => {
+    .map((item: NavItem) => {
       if (item.type === 'group') {
-        const filteredChildren = (item.children || []).filter(child => {
+        const filteredChildren = (item.children || []).filter((child: NavItem) => {
           const userRole = String(user?.role || '').toUpperCase();
           if (userRole === 'ADMIN') return true;
           if (child.roles?.includes('ALL')) return true;
@@ -159,7 +159,7 @@ export default function Sidebar() {
       if (item.roles?.some(r => String(r).toUpperCase() === userRole)) return item;
       return null;
     })
-    .filter(Boolean);
+    .filter((item): item is NavItem => item !== null);
 
   if (loading) {
     return <div className="w-64 bg-white border-r" />;
