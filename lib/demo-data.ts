@@ -195,9 +195,36 @@ function getDefaultFahrer(): DemoFahrer[] {
 
 function getDefaultFahrzeuge(): DemoFahrzeug[] {
   return [
-    { id: 'fz1', kennzeichen: 'STA-AB 1234', status: 'VERFUEGBAR' },
-    { id: 'fz2', kennzeichen: 'STA-CD 5678', status: 'VERFUEGBAR' },
-    { id: 'fz4', kennzeichen: 'STA-GH 3456', status: 'VERFUEGBAR' },
+    { 
+      id: 'fz1', 
+      kennzeichen: 'STA-AB 1234', 
+      modell: 'Mercedes-Benz Vito Tourer', 
+      baujahr: 2022, 
+      kmStand: 78500, 
+      status: 'VERFUEGBAR', 
+      anschaffungskosten: 48500,
+      verbrauchPro100Km: 9.2
+    },
+    { 
+      id: 'fz2', 
+      kennzeichen: 'STA-CD 5678', 
+      modell: 'Volkswagen Crafter', 
+      baujahr: 2021, 
+      kmStand: 112400, 
+      status: 'VERFUEGBAR', 
+      anschaffungskosten: 52900,
+      verbrauchPro100Km: 10.1
+    },
+    { 
+      id: 'fz4', 
+      kennzeichen: 'STA-GH 3456', 
+      modell: 'Mercedes-Benz Sprinter', 
+      baujahr: 2020, 
+      kmStand: 134800, 
+      status: 'VERFUEGBAR', 
+      anschaffungskosten: 46700,
+      verbrauchPro100Km: 11.4
+    },
   ];
 }
 
