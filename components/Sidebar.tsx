@@ -22,6 +22,7 @@ interface NavLink {
   label: string;
   icon: React.ComponentType<{ className?: string }>;
   roles?: string[];
+  type?: never;                    // wichtig für discriminated union
 }
 
 interface NavGroup {
@@ -153,15 +154,19 @@ export default function Sidebar() {
   // Filtering with group support
   const filteredNav: NavItem[] = allNavItems
     .map((item: NavItem) => {
-      if (item.type === 'group') {
-        const filteredChildren = (item.children || []).filter((child: NavLink) => {
+      // Type guard for NavGroup
+      if ('type' in item && item.type === 'group') {
+        const group = item as NavGroup;
+        const filteredChildren = group.children.filter((child: NavLink) => {
           const userRole = String(user?.role || '').toUpperCase();
           if (userRole === 'ADMIN') return true;
           if (child.roles?.includes('ALL')) return true;
           return child.roles?.some(r => String(r).toUpperCase() === userRole);
         });
-        return { ...item, children: filteredChildren } as NavGroup;
+        return { ...group, children: filteredChildren };
       }
+
+      // Normal NavLink
       const userRole = String(user?.role || '').toUpperCase();
       if (userRole === 'ADMIN') return item;
       if (item.roles?.includes('ALL')) return item;
@@ -220,18 +225,19 @@ export default function Sidebar() {
       {/* Navigation */}
       <nav className="flex-1 px-3 py-3 space-y-0.5 overflow-auto">
         {filteredNav.map((item: NavItem, index: number) => {
-          if (item.type === 'group') {
-            const isOpen = openGroups.includes(item.label);
-            const isGroupItselfActive = pathname === item.href;  // Only the group overview itself
-            const isAnyChildActive = item.children?.some(child => 
+          if ('type' in item && item.type === 'group') {
+            const group = item as NavGroup;
+            const isOpen = openGroups.includes(group.label);
+            const isGroupItselfActive = pathname === group.href;
+            const isAnyChildActive = group.children?.some(child =>
               pathname === child.href || pathname.startsWith(child.href + '/')
             );
 
             const toggleGroup = () => {
               if (isOpen) {
-                setOpenGroups(prev => prev.filter(g => g !== item.label));
+                setOpenGroups(prev => prev.filter(g => g !== group.label));
               } else {
-                setOpenGroups(prev => [...prev, item.label]);
+                setOpenGroups(prev => [...prev, group.label]);
               }
             };
 
@@ -247,8 +253,8 @@ export default function Sidebar() {
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <item.icon className="w-4 h-4" />
-                    <span>{item.label}</span>
+                    <group.icon className="w-4 h-4" />
+                    <span>{group.label}</span>
                   </div>
                   <span className={`transition-transform ${isOpen ? 'rotate-180' : ''}`}>▾</span>
                 </div>
@@ -256,7 +262,7 @@ export default function Sidebar() {
                 {/* Group Children */}
                 {isOpen && (
                   <div className="ml-6 mt-1 space-y-1 border-l border-slate-200 pl-3">
-                    {item.children?.map((child: NavLink) => {
+                    {group.children?.map((child: NavLink) => {
                       const ChildIcon = child.icon;
 
                       // Special handling for the Auftragsübersicht (index route)
