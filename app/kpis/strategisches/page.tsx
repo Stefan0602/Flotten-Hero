@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { KpiClient } from '@/lib/kpi-client';
+import type { FahrzeugInvestitionsKandidat } from '@/lib/kpi-service';
 
 export default function StrategischesControlling() {
   const [data, setData] = useState<any>(null);
@@ -88,10 +89,10 @@ export default function StrategischesControlling() {
             🔴 Ersatz prüfen ({data.ersatzKandidaten})
           </h3>
           <div className="space-y-3 max-h-[400px] overflow-auto">
-            {data.fahrzeuge.filter(f => f.empfehlung === 'Ersatz prüfen').length > 0 ? (
+            {data.fahrzeuge.filter((f: FahrzeugInvestitionsKandidat) => f.empfehlung === 'Ersatz prüfen').length > 0 ? (
               data.fahrzeuge
-                .filter(f => f.empfehlung === 'Ersatz prüfen')
-                .map((fz, index) => (
+                .filter((f: FahrzeugInvestitionsKandidat) => f.empfehlung === 'Ersatz prüfen')
+                .map((fz: FahrzeugInvestitionsKandidat, index: number) => (
                   <div key={index} className="p-4 bg-red-50 rounded-2xl border border-red-100">
                     <div className="font-semibold">{fz.kennzeichen} – {fz.modell}</div>
                     <div className="text-sm text-slate-600 mt-1">
@@ -114,10 +115,10 @@ export default function StrategischesControlling() {
             🟡 Beobachten ({data.beobachtungsKandidaten})
           </h3>
           <div className="space-y-3 max-h-[400px] overflow-auto">
-            {data.fahrzeuge.filter(f => f.empfehlung === 'Beobachten').length > 0 ? (
+            {data.fahrzeuge.filter((f: FahrzeugInvestitionsKandidat) => f.empfehlung === 'Beobachten').length > 0 ? (
               data.fahrzeuge
-                .filter(f => f.empfehlung === 'Beobachten')
-                .map((fz, index) => (
+                .filter((f: FahrzeugInvestitionsKandidat) => f.empfehlung === 'Beobachten')
+                .map((fz: FahrzeugInvestitionsKandidat, index: number) => (
                   <div key={index} className="p-4 bg-amber-50 rounded-2xl border border-amber-100">
                     <div className="font-semibold">{fz.kennzeichen} – {fz.modell}</div>
                     <div className="text-sm text-slate-600 mt-1">
