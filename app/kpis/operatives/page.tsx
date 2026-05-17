@@ -5,6 +5,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer 
 } from 'recharts';
 import { KpiClient } from '@/lib/kpi-client';
+import type { SollIstAbweichung } from '@/lib/kpi-service';
 
 export default function OperativesControlling() {
   const [data, setData] = useState<any>(null);
@@ -120,7 +121,7 @@ export default function OperativesControlling() {
                 </tr>
               </thead>
               <tbody>
-                {(data?.sollIstAbweichungen || []).map((row, index) => (
+                {(data?.sollIstAbweichungen || []).map((row: SollIstAbweichung, index: number) => (
                   <tr key={index} className="border-b last:border-none">
                     <td className="py-3 font-mono text-xs">{row.auftragId}</td>
                     <td className="py-3">{row.kunde}</td>
