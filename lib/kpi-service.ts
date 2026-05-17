@@ -222,10 +222,5 @@ export const KpiService = {
 // TYPE EXPORTS (for use in pages)
 // ========================================================
 
-export type { 
-  FahrzeugAuslastung, 
-  KostenProKm, 
-  FahrerAuslastung, 
-  SollIstAbweichung,
-  FahrzeugInvestitionsKandidat 
-};
+// Types are already exported via "export interface" above.
+// The previous re-export block was removed to avoid duplicate export conflicts.
