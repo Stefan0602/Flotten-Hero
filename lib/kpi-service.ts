@@ -134,17 +134,18 @@ export const KpiService = {
 
     // 4. Soll-Ist Abweichung KM
     const sollIstAbweichungen: SollIstAbweichung[] = auftraege
-      .filter(a => a.km && a.status === 'ABGESCHLOSSEN')
+      .filter((a): a is DemoAuftrag & { km: number } => !!a.km && a.status === 'ABGESCHLOSSEN')
       .map(a => {
-        const planKm = a.planKm || Math.round(a.km * (0.9 + Math.random() * 0.2));
-        const abweichung = a.km - planKm;
+        const km = a.km; // now guaranteed to be number
+        const planKm = a.planKm || Math.round(km * (0.9 + Math.random() * 0.2));
+        const abweichung = km - planKm;
         const abweichungProzent = planKm > 0 ? parseFloat(((abweichung / planKm) * 100).toFixed(1)) : 0;
 
         return {
           auftragId: a.id.substring(0, 6),
           kunde: a.kundeName,
           planKm,
-          istKm: a.km,
+          istKm: km,
           abweichung,
           abweichungProzent,
         };
