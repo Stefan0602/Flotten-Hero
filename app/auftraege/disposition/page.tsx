@@ -15,6 +15,7 @@ interface Auftrag {
   preis: number | null;
   fahrer?: { vorname: string; nachname: string } | null;
   fahrzeug?: { kennzeichen: string } | null;
+  fahrzeugId?: string;
 }
 
 interface Fahrer {
