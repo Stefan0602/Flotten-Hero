@@ -2,7 +2,8 @@ import {
   getDemoFahrzeuge, 
   getDemoAuftraege, 
   getDemoFahrer, 
-  getDemoWartungen 
+  getDemoWartungen,
+  DemoAuftrag 
 } from './demo-data';
 
 // ========================================================
