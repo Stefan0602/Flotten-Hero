@@ -17,14 +17,23 @@ interface SessionUser {
   mandantName: string;
 }
 
-interface NavItem {
-  href?: string;
+interface NavLink {
+  href: string;
   label: string;
   icon: React.ComponentType<{ className?: string }>;
   roles?: string[];
-  type?: 'group';
-  children?: NavItem[];
 }
+
+interface NavGroup {
+  type: 'group';
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  roles?: string[];
+  href?: string;
+  children: NavLink[];
+}
+
+type NavItem = NavLink | NavGroup;
 
 const allNavItems: NavItem[] = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: ['ALL'] },
@@ -145,13 +154,13 @@ export default function Sidebar() {
   const filteredNav: NavItem[] = allNavItems
     .map((item: NavItem) => {
       if (item.type === 'group') {
-        const filteredChildren = (item.children || []).filter((child: NavItem) => {
+        const filteredChildren = (item.children || []).filter((child: NavLink) => {
           const userRole = String(user?.role || '').toUpperCase();
           if (userRole === 'ADMIN') return true;
           if (child.roles?.includes('ALL')) return true;
           return child.roles?.some(r => String(r).toUpperCase() === userRole);
         });
-        return { ...item, children: filteredChildren };
+        return { ...item, children: filteredChildren } as NavGroup;
       }
       const userRole = String(user?.role || '').toUpperCase();
       if (userRole === 'ADMIN') return item;
@@ -247,7 +256,7 @@ export default function Sidebar() {
                 {/* Group Children */}
                 {isOpen && (
                   <div className="ml-6 mt-1 space-y-1 border-l border-slate-200 pl-3">
-                    {item.children?.map((child: NavItem) => {
+                    {item.children?.map((child: NavLink) => {
                       const ChildIcon = child.icon;
 
                       // Special handling for the Auftragsübersicht (index route)
@@ -277,13 +286,14 @@ export default function Sidebar() {
           }
 
           // Normal top-level item
-          const Icon = item.icon;
-          const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+          const linkItem = item as NavLink;
+          const Icon = linkItem.icon;
+          const isActive = pathname === linkItem.href || pathname.startsWith(linkItem.href + '/');
 
           return (
             <Link
-              key={item.href}
-              href={item.href}
+              key={linkItem.href}
+              href={linkItem.href}
               className={`flex items-center gap-3 px-4 py-2.5 rounded-2xl text-sm font-medium transition-all ${
                 isActive
                   ? 'bg-blue-600 text-white shadow-sm'
@@ -291,7 +301,7 @@ export default function Sidebar() {
               }`}
             >
               <Icon className="w-4 h-4" />
-              {item.label}
+              {linkItem.label}
             </Link>
           );
         })}
