@@ -17,7 +17,16 @@ interface SessionUser {
   mandantName: string;
 }
 
-const allNavItems = [
+interface NavItem {
+  href?: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  roles?: string[];
+  type?: 'group';
+  children?: NavItem[];
+}
+
+const allNavItems: NavItem[] = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: ['ALL'] },
 
   // Stammdaten as expandable group (tree structure)
@@ -133,7 +142,7 @@ export default function Sidebar() {
   }
 
   // Filtering with group support
-  const filteredNav = allNavItems
+  const filteredNav: NavItem[] = allNavItems
     .map(item => {
       if (item.type === 'group') {
         const filteredChildren = (item.children || []).filter(child => {
@@ -201,7 +210,7 @@ export default function Sidebar() {
 
       {/* Navigation */}
       <nav className="flex-1 px-3 py-3 space-y-0.5 overflow-auto">
-        {filteredNav.map((item, index) => {
+        {filteredNav.map((item: NavItem, index: number) => {
           if (item.type === 'group') {
             const isOpen = openGroups.includes(item.label);
             const isGroupItselfActive = pathname === item.href;  // Only the group overview itself
@@ -238,7 +247,7 @@ export default function Sidebar() {
                 {/* Group Children */}
                 {isOpen && (
                   <div className="ml-6 mt-1 space-y-1 border-l border-slate-200 pl-3">
-                    {item.children?.map((child) => {
+                    {item.children?.map((child: NavItem) => {
                       const ChildIcon = child.icon;
 
                       // Special handling for the Auftragsübersicht (index route)
